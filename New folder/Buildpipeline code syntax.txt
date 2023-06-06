@@ -1,0 +1,61 @@
+Buildpipeline code syntax:
+
+pipeline{
+    tools{
+        maven 'mymaven'
+    
+    }
+    agent any
+    stages{
+        stage('clone a repo')
+        {
+            steps{
+                git 'https://github.com/PArunSai/DevOpsCodeDemo.git'
+            }
+            
+        }
+        stage('compile the code')
+        {
+            steps
+            {
+            bat    'mvn compile'
+            }
+            
+        }
+        stage('code review')
+        {
+            steps{
+                bat 'mvn pmd:pmd'
+            }
+            
+        }
+        stage('unit testing')
+        {
+            steps{
+                bat 'mvn test'
+                
+            }
+        post
+        {
+            success
+            {
+                junit 'target/surefire-reports/*.xml'
+            }
+        }
+            
+        }
+        stage('package')
+        {
+            steps{
+                bat 'mvn package'
+                
+            }
+        post{
+            success{
+                jacoco()
+            }
+        }
+        }
+        
+    }
+}
